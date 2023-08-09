@@ -48,6 +48,9 @@ public class GameLoopManager : Singleton<GameLoopManager>
                 Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0)
                 );
 
+            var agent = (Agent) obj;
+            agent.Death += On_AgentDead;
+
             obj.Spawn();
         }
 

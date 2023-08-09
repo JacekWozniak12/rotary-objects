@@ -64,11 +64,13 @@ public class PoolingSystem : MonoBehaviour, IPoolingSystem
     {
         GameObject current = Instantiate(poolingObject);
         current.name = current.name.Replace("(Clone)", "");
+        current.transform.SetParent(transform);
 
         var pooled = current.GetComponent<IPooledObject>();
         pooled.Init(this);
         all.Add(pooled);
         available.Enqueue(pooled);
+        current.SetActive(false);
     }
 
     public IPooledObject GetObject()

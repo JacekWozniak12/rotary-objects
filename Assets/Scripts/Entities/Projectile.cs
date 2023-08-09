@@ -39,12 +39,17 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     #endregion
 
-    public static void Fire(Vector3 dir, float force)
+    public static void Fire(Vector3 pos, Vector3 dir, float force)
     {
-        var proj = GameLoopManager.I.Projectiles.GetObject();
+        if(GameLoopManager.I.Projectiles.GetObject() is not Projectile)
+        {
+            Debug.LogError("Wrong prefab in projectiles pool");
+        }
 
-
+        var proj = (Projectile) GameLoopManager.I.Projectiles.GetObject();
+        proj.transform.position = pos;
         proj.Spawn();
+        proj.rb.AddForce(dir.normalized * force);
     }
 
     #region Pooling System
@@ -57,6 +62,7 @@ public class Projectile : MonoBehaviour, IPooledObject
     public void Spawn()
     {
         gameObject.SetActive(true);
+        fired = true;
     }
 
     public void ReturnToPool()

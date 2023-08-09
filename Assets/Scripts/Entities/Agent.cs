@@ -8,7 +8,11 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     public Action Death { get; set; }
     public IPoolingSystem PoolingSystem { get; protected set; }
 
-    [SerializeField] private int startingHealth = 3, currentHealth;
+    [SerializeField] private int startingHealth = 3;
+    [SerializeField] private Transform barrel;
+
+    [Header("Dynamic")]
+    [SerializeField] private float currentHealth;
 
     // public void 
 
@@ -52,7 +56,7 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
         {
             float randomNumber = UnityEngine.Random.Range(0, 1f);
             yield return new WaitForSeconds(randomNumber);
-            Projectile.Fire(transform.forward, 75f);
+            Projectile.Fire(barrel.position, transform.forward, 750f);
         }
     }
 

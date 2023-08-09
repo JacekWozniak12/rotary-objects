@@ -48,9 +48,10 @@ public class Projectile : MonoBehaviour, IPooledObject
     public static void Fire(Vector3 pos, Vector3 dir, float force)
     {
         var proj = (Projectile)GameLoopManager.I.Projectiles.GetObject();
-        Debug.Log(proj);
         proj.transform.position = pos;
         proj.transform.forward = dir;
+        proj.rb.velocity = Vector3.zero;
+        proj.rb.angularVelocity = Vector3.zero;
         proj.Spawn();
         proj.rb.AddForce(dir * force, ForceMode.Impulse);
     }

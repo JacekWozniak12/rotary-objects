@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     [SerializeField] private float timeBeforeDespawn = 10;
     [SerializeField] private Rigidbody rb;
+    [SerializeField] private TrailRenderer tr;
 
     [Header("Dynamic")]
     [SerializeField] private bool fired;
@@ -29,6 +30,11 @@ public class Projectile : MonoBehaviour, IPooledObject
             return;
         }
 
+        if (!enabled)
+        {
+            return;
+        }
+
         timeFromSpawn += Time.fixedDeltaTime;
 
         if (timeFromSpawn > timeBeforeDespawn)
@@ -41,15 +47,12 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     public static void Fire(Vector3 pos, Vector3 dir, float force)
     {
-        if(GameLoopManager.I.Projectiles.GetObject() is not Projectile)
-        {
-            Debug.LogError("Wrong prefab in projectiles pool");
-        }
-
-        var proj = (Projectile) GameLoopManager.I.Projectiles.GetObject();
+        var proj = (Projectile)GameLoopManager.I.Projectiles.GetObject();
+        Debug.Log(proj);
         proj.transform.position = pos;
+        proj.transform.forward = dir;
         proj.Spawn();
-        proj.rb.AddForce(dir.normalized * force);
+        proj.rb.AddForce(dir * force, ForceMode.Impulse);
     }
 
     #region Pooling System
@@ -63,13 +66,18 @@ public class Projectile : MonoBehaviour, IPooledObject
     {
         gameObject.SetActive(true);
         fired = true;
+        tr.enabled = true;
+        tr.emitting = true;
     }
 
     public void ReturnToPool()
     {
+        timeFromSpawn = 0;
+        tr.emitting = false;
+        tr.enabled = false;
+        gameObject.SetActive(false);
         PoolingSystem.ReturnToPool(this);
         fired = false;
-        gameObject.SetActive(false);
     }
 
     #endregion

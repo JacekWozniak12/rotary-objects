@@ -13,8 +13,8 @@ public class PoolingSystem : MonoBehaviour, IPoolingSystem
     [SerializeField] private Queue<IPooledObject> available;
     [SerializeField] private List<IPooledObject> all;
 
-    public int CurrentAmount => available.Count;
-    public int AllAmount => all.Count;
+    public int GetCurrentAmount() => available.Count;
+    public int GetAmount() => all.Count;
 
     private void OnValidate()
     {

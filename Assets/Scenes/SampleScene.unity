@@ -446,7 +446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e322bd2208cf0694fa74bbaf780cc834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poolingObject: {fileID: 1895666890544060677, guid: 5b67a327eb21471409864fc26e9b474b, type: 3}
+  poolingObject: {fileID: 1895666890544060677, guid: 191a9cffd73fce6478ea509fd2228eb6, type: 3}
   baseAmount: 50
 --- !u!1 &963194225
 GameObject:
@@ -989,11 +989,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 172e42e430d27024fab7c71125ae49b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentAmounts: 3200000064000000fa000000f4010000
   <Agents>k__BackingField: {fileID: 851720068}
   <Projectiles>k__BackingField: {fileID: 300391394}
   BottomLeft: {x: -24, y: -24}
   TopRight: {x: 24, y: 24}
+  agentAmounts: 3200000064000000fa000000f4010000
 --- !u!4 &1738718837
 Transform:
   m_ObjectHideFlags: 0

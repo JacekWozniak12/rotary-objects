@@ -6,25 +6,45 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
 {
     public Action<int> HealthChanged { get; set; }
     public Action Death { get; set; }
+    public Action Rotate { get; set; }
+    public Action Show { get; set; }
+    public Action Hide { get; set; }
     public IPoolingSystem PoolingSystem { get; protected set; }
 
     [SerializeField] private int startingHealth = 3;
     [SerializeField] private Transform barrel;
+    [SerializeField] private MeshRenderer[] renderers;
+    [SerializeField] private Collider[] colliders;
 
     [Header("Dynamic")]
-    [SerializeField] private float currentHealth;
+    [SerializeField] private int currentHealth;
+    [SerializeField] private bool wasHit;
 
-    // public void 
+    private void Reset()
+    {
+        renderers = GetComponentsInChildren<MeshRenderer>();
+        colliders = GetComponentsInChildren<Collider>();
+    }
 
     public void Hit(int damage = 1)
     {
+        if (wasHit)
+        {
+            return;
+        }
+
         currentHealth -= damage;
+        HealthChanged?.Invoke(currentHealth);
 
         if (currentHealth <= 0)
         {
             Death?.Invoke();
             ReturnToPool();
+            return;
         }
+
+        Hide?.Invoke();
+        wasHit = true;
     }
 
     // Prolly Enable/Disable is not the best way but it suffices for now
@@ -32,21 +52,27 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     {
         StartCoroutine(ProcedureFire());
         StartCoroutine(ProcedureRotation());
+        StartCoroutine(ProcedureHide());
+        GameLoopManager.I.GameFinished += ReturnToPool;
     }
 
     private void OnDisable()
     {
+        GameLoopManager.I.GameFinished -= ReturnToPool;
         StopCoroutine(ProcedureFire());
         StopCoroutine(ProcedureRotation());
+        StopCoroutine(ProcedureHide());
     }
 
     protected IEnumerator ProcedureRotation()
     {
         while (enabled)
         {
-            float randomNumber = UnityEngine.Random.Range(0, 1f);
+            float randomNumber = UnityEngine.Random.Range(0f, 1f);
             yield return new WaitForSeconds(randomNumber);
+
             transform.eulerAngles = new Vector3(0, UnityEngine.Random.Range(0, 360), 0);
+            Rotate?.Invoke();
         }
     }
 
@@ -54,9 +80,48 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     {
         while (enabled)
         {
-            float randomNumber = UnityEngine.Random.Range(0, 1f);
-            yield return new WaitForSeconds(randomNumber);
-            Projectile.Fire(barrel.position, transform.forward, 750f);
+            yield return new WaitForSeconds(1f);
+
+            if (wasHit)
+            {
+                continue;
+            }
+
+            Projectile.Fire(barrel.position, transform.forward, 25f);
+        }
+    }
+
+    protected IEnumerator ProcedureHide()
+    {
+        while (enabled)
+        {
+            yield return new WaitUntil(() => wasHit);
+
+            foreach (var mr in renderers)
+            {
+                mr.enabled = false;
+            }
+
+            foreach (var c in colliders)
+            {
+                c.enabled = false;
+            }
+
+            yield return new WaitForSeconds(2);
+
+            foreach (var mr in renderers)
+            {
+                mr.enabled = true;
+            }
+
+            foreach (var c in colliders)
+            {
+                c.enabled = true;
+            }
+
+            GameLoopManager.I.SetObjectWithinMargins(transform);
+            wasHit = false;
+            Show?.Invoke();
         }
     }
 
@@ -71,12 +136,16 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     {
         currentHealth = startingHealth;
         gameObject.SetActive(true);
+        HealthChanged?.Invoke(currentHealth);
+        Show?.Invoke();
     }
 
     public void ReturnToPool()
     {
+        Hide?.Invoke();
         Death = null;
         HealthChanged = null;
+        wasHit = false;
         PoolingSystem.ReturnToPool(this);
         gameObject.SetActive(false);
     }

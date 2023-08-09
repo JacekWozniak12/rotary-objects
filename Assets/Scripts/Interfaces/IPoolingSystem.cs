@@ -1,6 +1,6 @@
 public interface IPoolingSystem
 {
-    int CurrentAmount { get; }
-    int AllAmount { get; }
+    int GetCurrentAmount();
+    int GetAmount();
     void ReturnToPool(IPooledObject pooledObject);
 }

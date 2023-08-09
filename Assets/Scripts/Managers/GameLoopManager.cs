@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class GameLoopManager : Singleton<GameLoopManager>
 {
-    [SerializeField] private int[] agentAmounts;
+    public Action GameFinished;
 
     [field: Header("Pooling")]
     [field: SerializeField] public PoolingSystem Agents { get; private set; }
@@ -14,6 +14,7 @@ public class GameLoopManager : Singleton<GameLoopManager>
 
     [Header("Settings")]
     [SerializeField] private Vector2 BottomLeft, TopRight;
+    [SerializeField] private int[] agentAmounts;
 
     private bool game;
     private int currentAgentAmount;
@@ -26,14 +27,14 @@ public class GameLoopManager : Singleton<GameLoopManager>
 
     public void StartNewGame(int amount)
     {
-        if (Agents.AllAmount > amount + 100)
+        if (Agents.GetAmount() > amount + 100)
         {
             Agents.RemovePoolObjects(100);
         }
 
-        if (Agents.AllAmount < amount)
+        if (Agents.GetAmount() < amount)
         {
-            Agents.AddPoolObjects(amount - Agents.AllAmount);
+            Agents.AddPoolObjects(amount - Agents.GetAmount());
         }
 
         for (int i = 0; i < amount; i++)
@@ -59,6 +60,14 @@ public class GameLoopManager : Singleton<GameLoopManager>
         GameUIManager.I.ExitAmountScreen();
     }
 
+    public void SetObjectWithinMargins(Transform transform)
+    {
+        transform.position = new Vector3(
+                    UnityEngine.Random.Range(BottomLeft.x, TopRight.x), 
+                    0, 
+                    UnityEngine.Random.Range(BottomLeft.y, TopRight.y));
+    }
+
     public void ShowChooseScreen()
     {
         GameUIManager.I.ExitMenuScreen();
@@ -73,9 +82,11 @@ public class GameLoopManager : Singleton<GameLoopManager>
     {
         currentAgentAmount -= 1;
 
-        if (currentAgentAmount <= 0)
+        if (currentAgentAmount <= 1)
         {
             game = false;
+            GameFinished?.Invoke();
+            ShowPostScreen();
         }
     }
 }

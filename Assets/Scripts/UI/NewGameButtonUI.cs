@@ -6,6 +6,11 @@ public class NewGameButtonUI : MonoBehaviour
 {
     [SerializeField] private Button buttonComponent;
 
+    private void Reset()
+    {
+        buttonComponent = GetComponent<Button>();
+    }
+
     private void Awake()
     {
         buttonComponent.onClick.AddListener(On_Click);

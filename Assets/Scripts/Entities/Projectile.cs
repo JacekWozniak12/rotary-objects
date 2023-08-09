@@ -5,6 +5,7 @@ public class Projectile : MonoBehaviour, IPooledObject
     public IPoolingSystem PoolingSystem { get; protected set; }
 
     [SerializeField] private float timeBeforeDespawn = 10;
+    [SerializeField] private Rigidbody rb;
 
     [Header("Dynamic")]
     [SerializeField] private bool fired;
@@ -14,7 +15,7 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other is Agent agent)
+        if (other.gameObject.GetComponentInParent<Agent>() is Agent agent)
         {
             agent.Hit();
             ReturnToPool();
@@ -38,16 +39,24 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     #endregion
 
+    public static void Fire(Vector3 dir, float force)
+    {
+        var proj = GameLoopManager.I.Projectiles.GetObject();
+
+
+        proj.Spawn();
+    }
+
     #region Pooling System
 
     public void Init(IPoolingSystem poolingSystem)
     {
-
+        PoolingSystem = poolingSystem;
     }
 
     public void Spawn()
     {
-
+        gameObject.SetActive(true);
     }
 
     public void ReturnToPool()

@@ -14,6 +14,7 @@ public class PoolingSystem : MonoBehaviour, IPoolingSystem
     [SerializeField] private List<IPooledObject> all;
 
     public int CurrentAmount => available.Count;
+    public int AllAmount => all.Count;
 
     private void OnValidate()
     {
@@ -43,6 +44,22 @@ public class PoolingSystem : MonoBehaviour, IPoolingSystem
         }
     }
 
+    public void RemovePoolObjects(int amount)
+    {
+        for (int i = all.Count - amount - 1; i < all.Count; i++)
+        {
+            Destroy(all[i].gameObject);
+        }
+
+        all.RemoveRange(all.Count - amount - 1, amount);
+        available.Clear();
+
+        foreach (var a in all)
+        {
+            available.Enqueue(a);
+        }
+    }
+
     protected void InstantiatePoolObject()
     {
         GameObject current = Instantiate(poolingObject);
@@ -51,7 +68,7 @@ public class PoolingSystem : MonoBehaviour, IPoolingSystem
         var pooled = current.GetComponent<IPooledObject>();
         pooled.Init(this);
         all.Add(pooled);
-        available.Add(pooled);
+        available.Enqueue(pooled);
     }
 
     public IPooledObject GetObject()

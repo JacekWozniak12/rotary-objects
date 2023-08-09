@@ -10,6 +10,12 @@ public class AgentAmountUI : MonoBehaviour
     [Header("Dynamic")]
     [SerializeField] private int amount;
 
+    private void Reset()
+    {
+        buttonComponent = GetComponent<Button>();
+        textComponent = GetComponentInChildren<TMP_Text>();
+    }
+
     private void Awake()
     {
         buttonComponent.onClick.AddListener(On_Click);
@@ -18,7 +24,7 @@ public class AgentAmountUI : MonoBehaviour
     public void Init(int value)
     {
         amount = value;
-        textComponent.text = value;
+        textComponent.text = "" + value;
     }
 
     private void On_Click()

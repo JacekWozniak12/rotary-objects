@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour, IPooledObject
 {
+    public IPoolingSystem PoolingSystem { get; protected set; }
+
     [SerializeField] private float timeBeforeDespawn = 10;
 
     [Header("Dynamic")]
@@ -15,7 +17,7 @@ public class Projectile : MonoBehaviour, IPooledObject
         if (other is Agent agent)
         {
             agent.Hit();
-
+            ReturnToPool();
         }
     }
 
@@ -50,7 +52,9 @@ public class Projectile : MonoBehaviour, IPooledObject
 
     public void ReturnToPool()
     {
-
+        PoolingSystem.ReturnToPool(this);
+        fired = false;
+        gameObject.SetActive(false);
     }
 
     #endregion

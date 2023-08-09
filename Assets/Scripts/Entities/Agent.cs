@@ -1,10 +1,12 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+using System;
 
-public class Agent : MonoBehaviour, IPooledObject, IHealthChangedObject
+public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
 {
-    public Action<int> HealthChanged;
-    public Action Death;
+    public Action<int> HealthChanged { get; protected set; }
+    public Action Death { get; protected set; }
+    public IPoolingSystem PoolingSystem { get; protected set; }
 
     [SerializeField] private int startingHealth = 3, currentHealth;
 
@@ -15,7 +17,7 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthChangedObject
         currentHealth -= damage;
 
 
-        if(currentHealth <= 0)
+        if (currentHealth <= 0)
         {
 
         }
@@ -23,12 +25,12 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthChangedObject
 
     protected IEnumerator ProcedureRotation()
     {
-
+        yield return new WaitForSecond(0.1f);
     }
 
     protected IEnumerator ProcedureFire()
     {
-
+        yield return new WaitForSecond(0.1f);
     }
 
     protected void OnDeath()

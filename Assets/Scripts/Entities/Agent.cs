@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using System;
 
-public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
+public class Agent : MonoBehaviour, IPooledObject
 {
     public Action<int> HealthChanged { get; set; }
     public Action Death { get; set; }
@@ -11,7 +11,7 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     public Action Hide { get; set; }
     public IPoolingSystem PoolingSystem { get; protected set; }
 
-    [SerializeField] private int startingHealth = 3;
+    [SerializeField] private int startingHealth = ConstGameSettings.DEFAULT_HEALTH;
     [SerializeField] private Transform barrel;
     [SerializeField] private MeshRenderer[] renderers;
     [SerializeField] private Collider[] colliders;
@@ -68,8 +68,8 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     {
         while (enabled)
         {
-            float randomNumber = UnityEngine.Random.Range(0f, 1f);
-            yield return new WaitForSeconds(randomNumber);
+            float randomNumber = UnityEngine.Random.Range(ConstGameSettings.DELAY_MIN_ROTATION, 1f);
+            yield return new WaitForSeconds(ConstGameSettings.DELAY_MAX_ROTATION);
 
             transform.eulerAngles = new Vector3(0, UnityEngine.Random.Range(0, 360), 0);
             Rotate?.Invoke();
@@ -80,14 +80,14 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
     {
         while (enabled)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(ConstGameSettings.DELAY_FIRE);
 
             if (wasHit)
             {
                 continue;
             }
 
-            Projectile.Fire(barrel.position, transform.forward, 25f);
+            Projectile.Fire(barrel.position, transform.forward, ConstGameSettings.PROJECTILE_FORCE);
         }
     }
 
@@ -107,7 +107,7 @@ public class Agent : MonoBehaviour, IPooledObject, IHealthStateChanged
                 c.enabled = false;
             }
 
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(ConstGameSettings.DELAY_HIT_RESPAWN);
 
             foreach (var mr in renderers)
             {
